@@ -18,6 +18,23 @@ interface Student {
   updated_at: string;
 }
 
+export interface StudentDocument {
+  id: number;
+  student_id: number;
+  student?: {
+    id: number;
+    full_name: string;
+  };
+  document_type: string;
+  document_name: string;
+  file_url: string;
+  file_path: string;
+  original_file_name: string;
+  mime_type: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const API_BASE_URL = 'http://localhost:8000/api';
 
 const api = axios.create({
@@ -46,6 +63,22 @@ export const studentService = {
   delete: (id: number): Promise<void> => api.delete(`/students/${id}`).then(res => res.data),
 };
 
+export const studentDocumentService = {
+  getAll: (studentId?: number): Promise<StudentDocument[]> => {
+    const params = new URLSearchParams();
+    if (studentId) {
+      params.append('student_id', String(studentId));
+    }
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return api.get(`/student-documents${query}`).then(res => res.data.data);
+  },
+  create: (formData: FormData): Promise<StudentDocument> =>
+    api.post('/student-documents', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then(res => res.data),
+  delete: (id: number): Promise<void> => api.delete(`/student-documents/${id}`).then(res => res.data),
+};
+
 export const facultyService = {
   getAll: (): Promise<Employee[]> => api.get('/employees').then(res => res.data.data),
   getById: (id: number): Promise<Employee> => api.get(`/employees/${id}`).then(res => res.data),
@@ -69,6 +102,14 @@ export const subjectService = {
   create: (subject: Partial<any>): Promise<any> => api.post('/subjects', subject).then(res => res.data),
   update: (id: number, subject: Partial<any>): Promise<any> => api.put(`/subjects/${id}`, subject).then(res => res.data),
   delete: (id: number): Promise<void> => api.delete(`/subjects/${id}`).then(res => res.data),
+};
+
+export const deploymentService = {
+  getAll: (): Promise<any[]> => api.get('/deployments').then(res => res.data.data || res.data),
+  getById: (id: number): Promise<any> => api.get(`/deployments/${id}`).then(res => res.data),
+  create: (deployment: any): Promise<any> => api.post('/deployments', deployment).then(res => res.data),
+  update: (id: number, deployment: any): Promise<any> => api.put(`/deployments/${id}`, deployment).then(res => res.data),
+  delete: (id: number): Promise<void> => api.delete(`/deployments/${id}`).then(res => res.data),
 };
 
 export const attendanceService = {

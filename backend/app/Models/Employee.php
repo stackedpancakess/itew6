@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Subject;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Employee extends Model
 {
@@ -37,6 +38,11 @@ class Employee extends Model
     public function approvedLeaveRequests(): HasMany
     {
         return $this->hasMany(LeaveRequest::class, 'approved_by');
+    }
+
+    public function subjects(): BelongsToMany
+    {
+        return $this->belongsToMany(Subject::class, 'employee_subject');
     }
 
     public function getFullNameAttribute(): string

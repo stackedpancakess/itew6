@@ -121,15 +121,16 @@ const StudentDashboard: React.FC = () => {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)', 
+      background: '#f1f5f9', 
       display: 'flex',
-      fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif'
+      fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+      color: '#0f172a'
     }}>
       {/* Sidebar */}
       <div 
         style={{
           width: (sidebarCollapsed && !sidebarHovered) ? '80px' : (sidebarHovered ? '280px' : '280px'),
-          background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #2d2d2d 100%)',
+          background: 'linear-gradient(180deg, #0f172a 0%, #111827 100%)',
           color: 'white',
           minHeight: '100vh',
           display: 'flex',
@@ -137,8 +138,8 @@ const StudentDashboard: React.FC = () => {
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           position: 'fixed',
           zIndex: 999,
-          boxShadow: '4px 0 20px rgba(255,107,53,0.3)',
-          borderRight: '2px solid #ff6b35'
+          boxShadow: '4px 0 24px rgba(15, 23, 42, 0.25)',
+          borderRight: '1px solid rgba(255,255,255,0.08)'
         }}
         onMouseEnter={() => setSidebarHovered(true)}
         onMouseLeave={() => setSidebarHovered(false)}
@@ -147,9 +148,9 @@ const StudentDashboard: React.FC = () => {
         <div style={{
           padding: (sidebarCollapsed && !sidebarHovered) ? '15px 10px' : '20px',
           textAlign: 'center',
-          borderBottom: '2px solid #ff6b35',
+          borderBottom: '1px solid rgba(255,255,255,0.12)',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          background: 'linear-gradient(135deg, rgba(255,107,53,0.15) 0%, rgba(255,107,53,0.08) 100%)',
+          background: 'rgba(255,255,255,0.05)',
           position: 'relative',
           overflow: 'hidden'
         }}>
@@ -221,10 +222,10 @@ const StudentDashboard: React.FC = () => {
         {/* Profile Section */}
         <div style={{
           padding: (sidebarCollapsed && !sidebarHovered) ? '20px 15px' : '35px 25px',
-          borderBottom: '2px solid #ff6b35',
+          borderBottom: '1px solid rgba(255,255,255,0.12)',
           textAlign: 'center',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          background: 'linear-gradient(135deg, rgba(255,107,53,0.08) 0%, rgba(255,107,53,0.03) 100%)',
+          background: 'rgba(255,255,255,0.05)',
           position: 'relative',
           overflow: 'hidden'
         }}>
@@ -672,7 +673,8 @@ const StudentDashboard: React.FC = () => {
         display: 'flex', 
         flexDirection: 'column', 
         marginLeft: (sidebarCollapsed && !sidebarHovered) ? '80px' : '280px', 
-        transition: 'margin-left 0.3s ease' 
+        transition: 'margin-left 0.3s ease',
+        background: '#f1f5f9'
       }}>
         {/* Header */}
         <div style={{
@@ -708,7 +710,7 @@ const StudentDashboard: React.FC = () => {
         <div style={{
           flex: 1,
           padding: 'clamp(20px, 4vw, 40px)',
-          background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)',
+          background: '#f1f5f9',
           overflowY: 'auto'
         }}>
           {/* Student Info Cards */}

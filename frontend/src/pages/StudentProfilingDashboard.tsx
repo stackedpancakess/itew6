@@ -253,107 +253,33 @@ const StudentProfilingDashboard: React.FC = () => {
           <div style={{ fontSize: '14px', color: '#64748b', fontFamily: 'Segoe UI, sans-serif' }}>Try adjusting your search or add a new profile</div>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(340px,1fr))', gap: '20px', marginBottom: '20px' }}>
-          {paginatedProfiles.map(profile => (
-            <div key={profile.id} style={{ background: '#fff', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', border: '1px solid rgba(0,0,0,0.06)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-              {/* Card header */}
-              <div style={{ background: 'linear-gradient(135deg,#1a1a1a 0%,#2d2d2d 100%)', padding: '16px 20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', flexWrap: 'wrap' }}>
-                  <div style={{ fontWeight: '700', fontSize: '16px', color: '#fff', fontFamily: 'Segoe UI, sans-serif' }}>{profile.student.full_name}</div>
-                  <span style={{ background: 'rgba(255,107,53,0.2)', color: '#ff6b35', border: '1px solid rgba(255,107,53,0.3)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '700', fontFamily: 'Segoe UI, sans-serif', whiteSpace: 'nowrap' }}>{profile.student.student_id}</span>
-                </div>
-                <div style={{ marginTop: '6px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                  <span style={{ background: 'rgba(99,102,241,0.2)', color: '#a5b4fc', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600', fontFamily: 'Segoe UI, sans-serif' }}>{profile.student.program}</span>
-                  <span style={{ background: 'rgba(16,185,129,0.2)', color: '#6ee7b7', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600', fontFamily: 'Segoe UI, sans-serif' }}>Year {profile.student.year_level}</span>
-                </div>
-              </div>
-              {/* Card body */}
-              <div style={{ padding: '16px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {/* GPA */}
-                {profile.academic_profile.gpa && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '14px' }}>🏆</span>
-                    <span style={{ fontSize: '12px', color: '#64748b', fontFamily: 'Segoe UI, sans-serif' }}>GPA:</span>
-                    <span style={{ background: 'linear-gradient(135deg,#f59e0b 0%,#d97706 100%)', color: '#fff', padding: '2px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '700', fontFamily: 'Segoe UI, sans-serif' }}>{profile.academic_profile.gpa}</span>
-                  </div>
-                )}
-                {/* Academic History */}
-                {profile.academic_profile.academic_history && (
-                  <div>
-                    <div style={{ fontSize: '12px', color: '#64748b', fontFamily: 'Segoe UI, sans-serif', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}><span>📚</span> Academic History</div>
-                    <div style={{ fontSize: '13px', color: '#374151', fontFamily: 'Segoe UI, sans-serif', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>{profile.academic_profile.academic_history}</div>
-                  </div>
-                )}
-                {/* Career Aspiration */}
-                {profile.academic_profile.career_aspiration && (
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                    <span style={{ fontSize: '14px', flexShrink: 0 }}>🎯</span>
-                    <div style={{ fontSize: '13px', color: '#374151', fontFamily: 'Segoe UI, sans-serif' }}>{profile.academic_profile.career_aspiration}</div>
-                  </div>
-                )}
-                {/* Activities */}
-                {profile.activities.non_academic_activities && (
-                  <div>
-                    <div style={{ fontSize: '12px', color: '#64748b', fontFamily: 'Segoe UI, sans-serif', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}><span>🎭</span> Activities</div>
-                    <div style={{ fontSize: '13px', color: '#374151', fontFamily: 'Segoe UI, sans-serif', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any }}>{profile.activities.non_academic_activities}</div>
-                  </div>
-                )}
-                {/* Skills */}
-                {(profile.activities.skills || []).length > 0 && (
-                  <div>
-                    <div style={{ fontSize: '12px', color: '#64748b', fontFamily: 'Segoe UI, sans-serif', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}><span>🔧</span> Skills</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {(profile.activities.skills || []).slice(0, 5).map((skill, i) => (
-                        <span key={i} style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600', fontFamily: 'Segoe UI, sans-serif' }}>{skill}</span>
-                      ))}
-                      {(profile.activities.skills || []).length > 5 && (
-                        <span style={{ background: '#f1f5f9', color: '#64748b', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontFamily: 'Segoe UI, sans-serif' }}>+{(profile.activities.skills || []).length - 5} more</span>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {/* Affiliations */}
-                {(profile.activities.affiliations || []).length > 0 && (
-                  <div>
-                    <div style={{ fontSize: '12px', color: '#64748b', fontFamily: 'Segoe UI, sans-serif', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}><span>🏛️</span> Affiliations</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {(profile.activities.affiliations || []).slice(0, 4).map((aff, i) => (
-                        <span key={i} style={{ background: 'rgba(16,185,129,0.1)', color: '#059669', border: '1px solid rgba(16,185,129,0.2)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600', fontFamily: 'Segoe UI, sans-serif' }}>{aff}</span>
-                      ))}
-                      {(profile.activities.affiliations || []).length > 4 && (
-                        <span style={{ background: '#f1f5f9', color: '#64748b', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontFamily: 'Segoe UI, sans-serif' }}>+{(profile.activities.affiliations || []).length - 4} more</span>
-                      )}
-                    </div>
-                  </div>
-                )}
-                {/* Violations */}
-                {profile.activities.violations && profile.activities.violations.trim() !== '' && (
-                  <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '8px 12px' }}>
-                    <div style={{ fontSize: '12px', color: '#dc2626', fontFamily: 'Segoe UI, sans-serif', fontWeight: '600', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}><span>⚠️</span> Violations</div>
-                    <div style={{ fontSize: '13px', color: '#991b1b', fontFamily: 'Segoe UI, sans-serif' }}>{profile.activities.violations}</div>
-                  </div>
-                )}
-              </div>
-              {/* Card footer */}
-              <div style={{ padding: '12px 20px', borderTop: '1px solid #f1f5f9', display: 'flex', gap: '8px' }}>
-                <button onClick={() => setSelectedProfile(profile)}
-                  style={{ flex: 1, padding: '8px', background: 'rgba(59,130,246,0.08)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Segoe UI, sans-serif', transition: 'all 0.15s' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#3b82f6'; e.currentTarget.style.color = '#fff'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(59,130,246,0.08)'; e.currentTarget.style.color = '#3b82f6'; }}
-                >View</button>
-                <button onClick={() => openEdit(profile)}
-                  style={{ flex: 1, padding: '8px', background: 'rgba(16,185,129,0.08)', color: '#059669', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Segoe UI, sans-serif', transition: 'all 0.15s' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#10b981'; e.currentTarget.style.color = '#fff'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(16,185,129,0.08)'; e.currentTarget.style.color = '#059669'; }}
-                >Edit</button>
-                <button onClick={() => void deleteProfile(profile)}
-                  style={{ flex: 1, padding: '8px', background: 'rgba(239,68,68,0.08)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', fontSize: '13px', fontWeight: '600', cursor: 'pointer', fontFamily: 'Segoe UI, sans-serif', transition: 'all 0.15s' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.color = '#dc2626'; }}
-                >Delete</button>
-              </div>
-            </div>
-          ))}
+        <div style={{ overflowX: 'auto', marginBottom: '20px', background: '#fff', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', border: '1px solid rgba(0,0,0,0.06)' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '1000px', fontFamily: 'Segoe UI, sans-serif' }}>
+            <thead>
+              <tr>
+                {['Student Name', 'Student ID', 'Program', 'Year', 'GPA', 'Needs Attention', 'Actions'].map((heading) => (
+                  <th key={heading} style={{ textAlign: 'left', padding: '16px 18px', fontSize: '12px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.08em', borderBottom: '1px solid #e5e7eb', background: '#f8fafc' }}>{heading}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedProfiles.map((profile) => (
+                <tr key={profile.id} style={{ transition: 'background 0.2s' }}>
+                  <td onClick={() => setSelectedProfile(profile)} style={{ padding: '16px 18px', borderBottom: '1px solid #e5e7eb', fontWeight: 600, color: '#1f2937', cursor: 'pointer' }}>{profile.student.full_name}</td>
+                  <td onClick={() => setSelectedProfile(profile)} style={{ padding: '16px 18px', borderBottom: '1px solid #e5e7eb', color: '#475569', cursor: 'pointer' }}>{profile.student.student_id}</td>
+                  <td onClick={() => setSelectedProfile(profile)} style={{ padding: '16px 18px', borderBottom: '1px solid #e5e7eb', color: '#475569', cursor: 'pointer' }}>{profile.student.program}</td>
+                  <td onClick={() => setSelectedProfile(profile)} style={{ padding: '16px 18px', borderBottom: '1px solid #e5e7eb', color: '#475569', cursor: 'pointer' }}>Year {profile.student.year_level}</td>
+                  <td onClick={() => setSelectedProfile(profile)} style={{ padding: '16px 18px', borderBottom: '1px solid #e5e7eb', color: '#475569', cursor: 'pointer' }}>{profile.academic_profile.gpa ?? 'N/A'}</td>
+                  <td onClick={() => setSelectedProfile(profile)} style={{ padding: '16px 18px', borderBottom: '1px solid #e5e7eb', color: profile.activities.violations ? '#b91c1c' : '#15803d', fontWeight: 700, cursor: 'pointer' }}>{profile.activities.violations ? 'Yes' : 'No'}</td>
+                  <td style={{ padding: '16px 18px', borderBottom: '1px solid #e5e7eb', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button onClick={(e) => { e.stopPropagation(); setSelectedProfile(profile); }} style={{ padding: '8px 12px', background: 'rgba(59,130,246,0.08)', color: '#3b82f6', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'Segoe UI, sans-serif' }}>View</button>
+                    <button onClick={(e) => { e.stopPropagation(); openEdit(profile); }} style={{ padding: '8px 12px', background: 'rgba(16,185,129,0.08)', color: '#059669', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'Segoe UI, sans-serif' }}>Edit</button>
+                    <button onClick={(e) => { e.stopPropagation(); void deleteProfile(profile); }} style={{ padding: '8px 12px', background: 'rgba(239,68,68,0.08)', color: '#dc2626', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'Segoe UI, sans-serif' }}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

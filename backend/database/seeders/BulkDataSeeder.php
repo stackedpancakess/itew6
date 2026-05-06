@@ -141,10 +141,10 @@ class BulkDataSeeder extends Seeder
     private function generateFirstName(): string
     {
         $firstNames = [
-            'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas', 'Charles',
-            'Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan', 'Jessica', 'Sarah', 'Karen',
-            'Lisa', 'Nancy', 'Betty', 'Helen', 'Sandra', 'Donna', 'Carol', 'Ruth', 'Sharon', 'Michelle',
-            'Laura', 'Sarah', 'Kimberly', 'Ashley', 'Amanda', 'Melissa', 'Deborah', 'Stephanie', 'Rebecca', 'Sharon'
+            'Maria', 'Jose', 'Antonio', 'Manuel', 'Francisco', 'Juan', 'Pedro', 'Miguel', 'Angel', 'Luis',
+            'Ana', 'Rosa', 'Carmen', 'Isabel', 'Cristina', 'Maria', 'Pilar', 'Dolores', 'Teresa', 'Angela',
+            'Roberto', 'Carlos', 'Fernando', 'Ricardo', 'Eduardo', 'Rafael', 'Alberto', 'Emilio', 'Gabriel', 'Hugo',
+            'Elena', 'Sofia', 'Lucia', 'Beatriz', 'Patricia', 'Mercedes', 'Concepcion', 'Victoria', 'Amelia', 'Gloria'
         ];
         return $firstNames[array_rand($firstNames)];
     }
@@ -152,10 +152,10 @@ class BulkDataSeeder extends Seeder
     private function generateLastName(): string
     {
         $lastNames = [
-            'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez',
-            'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin',
-            'Lee', 'Perez', 'Thompson', 'White', 'Harris', 'Sanchez', 'Clark', 'Ramirez', 'Lewis', 'Robinson',
-            'Walker', 'Young', 'Allen', 'King', 'Wright', 'Scott', 'Torres', 'Nguyen', 'Hill', 'Flores'
+            'Santos', 'Reyes', 'Cruz', 'Garcia', 'Mendoza', 'Torres', 'Flores', 'Ramos', 'Villanueva', 'Morales',
+            'Dela Cruz', 'Rodriguez', 'Fernandez', 'Gonzales', 'Martinez', 'Lopez', 'Hernandez', 'Perez', 'Santiago', 'Aguilar',
+            'Gutierrez', 'Ramirez', 'Moreno', 'Jimenez', 'Ruiz', 'Diaz', 'Morales', 'Ortiz', 'Chavez', 'Castillo',
+            'Rivera', 'Gomez', 'Vasquez', 'Sanchez', 'Romero', 'Herrera', 'Medina', 'Castro', 'Vargas', 'Guerrero'
         ];
         return $lastNames[array_rand($lastNames)];
     }

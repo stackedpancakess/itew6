@@ -57,9 +57,9 @@ class StudentWithoutProfileSeeder extends Seeder
     private function generateFirstName(): string
     {
         $firstNames = [
-            'Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Avery', 'Quinn',
-            'Blake', 'Drew', 'Sage', 'River', 'Skyler', 'Phoenix', 'Reese', 'Cameron',
-            'Dakota', 'Emerson', 'Parker', 'Spencer', 'Jamie', 'Kendall', 'Logan', 'Aidan'
+            'Andrei', 'Bianca', 'Carlo', 'Diana', 'Emmanuel', 'Francesca', 'Gabriel', 'Hannah',
+            'Ian', 'Julia', 'Kenneth', 'Luna', 'Marco', 'Nicole', 'Oliver', 'Paola',
+            'Rafael', 'Sophia', 'Tristan', 'Victoria', 'Xavier', 'Yasmine', 'Zandro', 'Alexa'
         ];
         return $firstNames[array_rand($firstNames)];
     }
@@ -67,9 +67,9 @@ class StudentWithoutProfileSeeder extends Seeder
     private function generateLastName(): string
     {
         $lastNames = [
-            'Cooper', 'Bailey', 'Reed', 'Hayes', 'Bennett', 'Gray', 'Ward', 'Brooks',
-            'Bell', 'Cole', 'Cox', 'Howard', 'Rivera', 'Cook', 'Morgan', 'Peterson',
-            'Cooper', 'Reed', 'Bailey', 'Bell', 'Gomez', 'Kelley', 'Floyd', 'Duncan'
+            'Aquino', 'Bautista', 'Castro', 'Domingo', 'Estrada', 'Fernandez', 'Gonzaga', 'Hernandez',
+            'Ignacio', 'Jimenez', 'Lazaro', 'Mercado', 'Navarro', 'Ocampo', 'Padilla', 'Quintana',
+            'Rizal', 'Salazar', 'Tolentino', 'Valdez', 'Zamora', 'Alvarez', 'Bermudez', 'Cervantes'
         ];
         return $lastNames[array_rand($lastNames)];
     }

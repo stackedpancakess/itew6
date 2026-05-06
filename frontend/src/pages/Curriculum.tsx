@@ -87,7 +87,8 @@ const Curriculum: React.FC = () => {
               { id: 9, code: 'IT109', name: 'Cybersecurity Fundamentals', description: 'Information security principles and practices' },
               { id: 10, code: 'IT110', name: 'Cloud Computing', description: 'Cloud services and virtualization' },
               { id: 11, code: 'IT111', name: 'Mobile Development', description: 'iOS and Android application development' },
-              { id: 12, code: 'IT112', name: 'Data Analytics', description: 'Business intelligence and data analysis' }
+              { id: 12, code: 'IT112', name: 'Data Analytics', description: 'Business intelligence and data analysis' },
+              { id: 13, code: 'IT113', name: 'Software Quality Assurance', description: 'Testing methods, quality control, and release management' }
             ],
             totalCredits: 150,
             duration: '4 Years',

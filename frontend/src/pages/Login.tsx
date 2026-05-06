@@ -62,6 +62,119 @@ const Login: React.FC = () => {
           return;
         }
       }
+
+      // Check for admin account
+      if (formData.id === 'ccsadmin@pnc.edu.ph') {
+        if (formData.password === 'adminacc') {
+          console.log('Admin credentials correct!');
+          // Store admin account info in localStorage
+          const userData = {
+            id: formData.id,
+            email: formData.id,
+            name: 'CCS Admin',
+            role: 'admin',
+            department: 'College of Computer Studies',
+            isAuthenticated: true
+          };
+          
+          localStorage.setItem('user', JSON.stringify(userData));
+          console.log('Admin user data stored:', userData);
+          
+          console.log('About to navigate to admin dashboard...');
+          navigate('/dashboard');
+          return;
+        } else {
+          // Wrong admin password
+          console.log('Admin credentials wrong!');
+          setErrors({ general: 'Wrong credentials' });
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Check for faculty login (firstname.faculty@pnc.edu.ph)
+      if (formData.id.endsWith('.faculty@pnc.edu.ph')) {
+        if (formData.password === 'facultyacc') {
+          console.log('Faculty credentials correct!');
+          // Extract first name from email
+          const firstName = formData.id.split('.')[0];
+          
+          // Find employee by first name
+          const employees = await employeeService.getAll();
+          const employee = employees.find((emp: any) => 
+            emp.first_name.toLowerCase() === firstName.toLowerCase()
+          );
+          
+          if (employee) {
+            // Store faculty account info in localStorage
+            const userData = {
+              id: formData.id,
+              employeeId: employee.id,
+              name: `${employee.first_name} ${employee.last_name}`,
+              email: formData.id,
+              role: 'faculty',
+              department: 'College of Computer Studies',
+              position: employee.position,
+              isAuthenticated: true
+            };
+            
+            localStorage.setItem('user', JSON.stringify(userData));
+            console.log('Faculty user data stored:', userData);
+            
+            console.log('About to navigate to faculty dashboard...');
+            navigate('/faculty-dashboard');
+            return;
+          }
+        } else {
+          // Wrong faculty password
+          console.log('Faculty credentials wrong!');
+          setErrors({ general: 'Wrong credentials' });
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Check for student login (student_id with password 'studentccs')
+      if (!isNaN(Number(formData.id)) && formData.password === 'studentccs') {
+        try {
+          const students = await studentService.getAll();
+          console.log('Fetched students:', students);
+          
+          const student = students.find((stu: any) => stu.student_id === formData.id);
+          console.log('Student found:', student);
+          
+          if (student) {
+            console.log('Student credentials correct!');
+            
+            // Check if student is active
+            if (student.status !== 'active') {
+              setErrors({ general: 'Student account is not active. Please contact administrator.' });
+              setLoading(false);
+              return;
+            }
+            
+            // Store student info in localStorage
+            const userData = {
+              id: formData.id,
+              studentId: student.id,
+              name: `${student.first_name} ${student.last_name}`,
+              email: student.email,
+              role: 'student',
+              isAuthenticated: true,
+              needsPasswordChange: true // Flag to prompt password change
+            };
+            
+            localStorage.setItem('user', JSON.stringify(userData));
+            console.log('Student user data stored:', userData);
+            
+            console.log('About to navigate to student dashboard...');
+            navigate('/student-dashboard');
+            return;
+          }
+        } catch (error) {
+          console.error('Student login error:', error);
+        }
+      }
       
       // Check for faculty login
       if (formData.id === 'rrgarcia@pnc.edu.ph') {
@@ -112,7 +225,7 @@ const Login: React.FC = () => {
           
           // Validate password (default password or changed password)
           // For now, we'll use the default password
-          const defaultPassword = 'pncdangalngbayan2026';
+          const defaultPassword = 'studentccs';
           if (formData.password !== defaultPassword) {
             setErrors({ general: 'Invalid Student ID or password' });
             setLoading(false);
@@ -301,13 +414,13 @@ const Login: React.FC = () => {
             margin: '0 0 8px 0'
           }}>
             CCS Department
-            <h6 style={{
-              fontSize: '16px',
-              fontWeight: 'normal',
-              color: '#ff6b35',
-              margin: '4px 0 0 0'
-            }}>College of Computing Studies</h6>
           </h1>
+          <h6 style={{
+            fontSize: '16px',
+            fontWeight: 'normal',
+            color: '#ff6b35',
+            margin: '4px 0 0 0'
+          }}>College of Computing Studies</h6>
           <p style={{
             fontSize: '14px',
             color: '#ff6b35',

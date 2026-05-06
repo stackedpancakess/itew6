@@ -30,6 +30,7 @@ const navigationGroups = [
     items: [
       { name: 'Employees', href: '/employees', icon: UserGroupIcon },
       { name: 'Students', href: '/students', icon: AcademicCapIcon },
+      { name: 'Student Documents', href: '/student-documents', icon: DocumentTextIcon },
       { name: 'Student Profiling', href: '/student-profiling', icon: UserCircleIcon },
     ],
   },

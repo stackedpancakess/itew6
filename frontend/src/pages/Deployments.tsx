@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { studentService, employeeService } from '../services/api';
+import { studentService, employeeService, deploymentService, subjectService } from '../services/api';
 
 interface Student {
   id: number;
@@ -10,6 +10,7 @@ interface Student {
   email: string;
   phone: string;
   year_level: number;
+  section?: string;
   program: string;
   status: 'active' | 'inactive' | 'graduated';
   date_enrolled: string;
@@ -30,11 +31,17 @@ interface Employee {
   updated_at: string;
 }
 
+interface Subject {
+  id: number;
+  code: string;
+  name: string;
+}
+
 interface Deployment {
   id: number;
-  student_id: number;
-  professor_id: number;
-  subject: string;
+  student: Student;
+  professor: Employee;
+  subject: Subject;
   semester: string;
   academic_year: string;
   status: 'active' | 'completed';
@@ -45,9 +52,12 @@ interface Deployment {
 const Deployments: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
   const [professors, setProfessors] = useState<Employee[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const currentYear = new Date().getFullYear();
   const defaultAcademicYear = `${currentYear}-${currentYear + 1}`;
 
@@ -67,28 +77,68 @@ const Deployments: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const [studentsData, employeesData] = await Promise.all([
+      const [studentsData, employeesData, subjectsData, deploymentsData] = await Promise.all([
         studentService.getAll(),
         employeeService.getAll(),
+        subjectService.getAll(),
+        deploymentService.getAll(),
       ]);
-      
+
       const professorsData = employeesData.filter(emp => 
-        emp.position === 'Prof' || emp.position === 'Dept Chair' || emp.position === 'Dean'
+        emp.position.includes('Professor') || emp.position.includes('Dean') || emp.position.includes('Chair')
       );
-      
+
       setStudents(Array.isArray(studentsData) ? studentsData : []);
       setProfessors(professorsData);
-      // TODO: Fetch deployments when API is ready
-      setDeployments([]);
+      setSubjects(Array.isArray(subjectsData) ? subjectsData : []);
+      setDeployments(Array.isArray(deploymentsData) ? deploymentsData : []);
     } catch (error) {
       console.error('Error fetching data:', error);
       setStudents([]);
       setProfessors([]);
+      setSubjects([]);
       setDeployments([]);
     } finally {
       setLoading(false);
     }
   };
+
+  const sortedDeployments = React.useMemo(() => {
+    return [...deployments].sort((a, b) => {
+      const aYear = a.student?.year_level ?? 0;
+      const bYear = b.student?.year_level ?? 0;
+      if (aYear !== bYear) return aYear - bYear;
+
+      const aSection = (a.student?.section ?? '').toString().toLowerCase();
+      const bSection = (b.student?.section ?? '').toString().toLowerCase();
+      const sectionCompare = aSection.localeCompare(bSection);
+      if (sectionCompare !== 0) return sectionCompare;
+
+      const aLastName = (a.student?.last_name ?? '').toString().toLowerCase();
+      const bLastName = (b.student?.last_name ?? '').toString().toLowerCase();
+      const nameCompare = aLastName.localeCompare(bLastName);
+      if (nameCompare !== 0) return nameCompare;
+
+      return (a.student?.first_name ?? '').toString().toLowerCase().localeCompare((b.student?.first_name ?? '').toString().toLowerCase());
+    });
+  }, [deployments]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedDeployments.length / rowsPerPage));
+
+  React.useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [rowsPerPage, sortedDeployments.length]);
+
+  const paginatedDeployments = React.useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    return sortedDeployments.slice(start, start + rowsPerPage);
+  }, [sortedDeployments, currentPage, rowsPerPage]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -193,6 +243,12 @@ const Deployments: React.FC = () => {
                 Student
               </th>
               <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
+                Year
+              </th>
+              <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
+                Section
+              </th>
+              <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
                 Professor
               </th>
               <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: '#6b7280', textTransform: 'uppercase' }}>
@@ -210,29 +266,36 @@ const Deployments: React.FC = () => {
             </tr>
           </thead>
           <tbody style={{ backgroundColor: 'white' }}>
-            {deployments.length === 0 ? (
+            {sortedDeployments.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: '48px', textAlign: 'center', color: '#6b7280' }}>
+                <td colSpan={8} style={{ padding: '48px', textAlign: 'center', color: '#6b7280' }}>
                   No deployments found. Click "New Deployment" to assign students to professors.
                 </td>
               </tr>
             ) : (
-              deployments.map((deployment) => (
+              paginatedDeployments.map((deployment) => (
                 <tr key={deployment.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                   <td style={{ padding: '16px' }}>
                     <div style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>
-                      {/* TODO: Find student by ID */}
-                      Student ID: {deployment.student_id}
+                      {deployment.student?.full_name ?? 'Unknown Student'}
                     </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{deployment.student?.student_id}</div>
+                  </td>
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ fontSize: '14px', color: '#111827' }}>{deployment.student?.year_level ?? '—'}</div>
+                  </td>
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ fontSize: '14px', color: '#111827' }}>{deployment.student?.section ?? '—'}</div>
                   </td>
                   <td style={{ padding: '16px' }}>
                     <div style={{ fontSize: '14px', color: '#111827' }}>
-                      {/* TODO: Find professor by ID */}
-                      Professor ID: {deployment.professor_id}
+                      {deployment.professor?.full_name ?? 'Unknown Professor'}
                     </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{deployment.professor?.position}</div>
                   </td>
                   <td style={{ padding: '16px' }}>
-                    <div style={{ fontSize: '14px', color: '#111827' }}>{deployment.subject}</div>
+                    <div style={{ fontSize: '14px', color: '#111827' }}>{deployment.subject?.name ?? 'Unknown Subject'}</div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{deployment.subject?.code}</div>
                   </td>
                   <td style={{ padding: '16px' }}>
                     <div style={{ fontSize: '14px', color: '#111827' }}>{deployment.semester}</div>
@@ -257,6 +320,68 @@ const Deployments: React.FC = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginTop: '16px' }}>
+        <div style={{ color: '#6b7280', fontSize: '14px' }}>
+          Showing {(sortedDeployments.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1)}–{Math.min(sortedDeployments.length, currentPage * rowsPerPage)} of {sortedDeployments.length} deployments
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: '#374151', fontSize: '14px' }}>Rows per page:</span>
+            <select
+              value={rowsPerPage}
+              onChange={(e) => setRowsPerPage(Number(e.target.value))}
+              style={{
+                padding: '8px 10px',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                backgroundColor: 'white',
+                color: '#111827',
+                fontSize: '14px'
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: currentPage === 1 ? '#e5e7eb' : '#fff',
+                color: currentPage === 1 ? '#9ca3af' : '#111827',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+              }}
+            >
+              Previous
+            </button>
+            <span style={{ color: '#374151', fontSize: '14px' }}>
+              Page {currentPage} of {Math.max(1, Math.ceil(sortedDeployments.length / rowsPerPage))}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: currentPage === totalPages ? '#e5e7eb' : '#fff',
+                color: currentPage === totalPages ? '#9ca3af' : '#111827',
+                border: '1px solid #d1d5db',
+                borderRadius: '6px',
+                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
+              }}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
 
       {showModal && (
@@ -362,18 +487,11 @@ const Deployments: React.FC = () => {
                     }}
                   >
                     <option value="">Select Subject</option>
-                    <option value="Data Structures">Data Structures</option>
-                    <option value="Algorithms">Algorithms</option>
-                    <option value="Web Development">Web Development</option>
-                    <option value="Database Systems">Database Systems</option>
-                    <option value="Computer Networks">Computer Networks</option>
-                    <option value="Operating Systems">Operating Systems</option>
-                    <option value="Software Engineering">Software Engineering</option>
-                    <option value="Artificial Intelligence">Artificial Intelligence</option>
-                    <option value="Machine Learning">Machine Learning</option>
-                    <option value="Cybersecurity">Cybersecurity</option>
-                    <option value="Mobile Development">Mobile Development</option>
-                    <option value="Cloud Computing">Cloud Computing</option>
+                    {subjects.map((subject) => (
+                      <option key={subject.id} value={subject.id}>
+                        {subject.code} - {subject.name}
+                      </option>
+                    ))}
                   </select>
                   {errors.subject && (
                     <div style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>
