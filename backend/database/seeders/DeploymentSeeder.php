@@ -43,7 +43,9 @@ class DeploymentSeeder extends Seeder
                     return $professor->subjects->contains('id', $subject->id);
                 });
 
-                $professor = $teachersForSubject->random() ?? $professors->random();
+                $professor = $teachersForSubject->isNotEmpty()
+                    ? $teachersForSubject->random()
+                    : $professors->random();
 
                 Deployment::create([
                     'student_id' => $student->id,

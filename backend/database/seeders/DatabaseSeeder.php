@@ -25,8 +25,8 @@ class DatabaseSeeder extends Seeder
             BulkDataSeeder::class,
             StudentWithoutProfileSeeder::class,
             SubjectSeeder::class,
-            DeploymentSeeder::class,
             TestUserSeeder::class,
+            DeploymentSeeder::class,
         ]);
     }
 }
