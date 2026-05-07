@@ -22,6 +22,8 @@ interface Announcement {
   created_at: string;
 }
 
+const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/\/$/, '');
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState({
@@ -795,7 +797,7 @@ const AnnouncementViewModal: React.FC<{
   const renderAttachment = () => {
     if (!announcement.attachment_path) return null;
 
-    const attachmentUrl = `http://localhost:8000/${announcement.attachment_path}`;
+    const attachmentUrl = `${BACKEND_URL}/${announcement.attachment_path}`;
     
     switch (announcement.attachment_type) {
       case 'image':
