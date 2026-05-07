@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\DepartmentController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\FavoriteStudentController;
 use App\Http\Controllers\Api\LeaveRequestController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\StudentDocumentController;
@@ -35,6 +36,12 @@ Route::middleware('api')->group(function () {
     // Employee statistics
     Route::get('employees/{employee}/attendances', [EmployeeController::class, 'attendances']);
     Route::get('employees/{employee}/leave-requests', [EmployeeController::class, 'leaveRequests']);
+
+
+    // Favorite students
+    Route::get('favorite-students', [FavoriteStudentController::class, 'index']);
+    Route::post('favorite-students', [FavoriteStudentController::class, 'store']);
+    Route::delete('favorite-students/{studentId}', [FavoriteStudentController::class, 'destroy']);
 
     // Student Profiles
     Route::get('/student-profiles', [StudentProfileController::class, 'index']);
