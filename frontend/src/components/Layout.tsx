@@ -15,6 +15,7 @@ import {
   XMarkIcon,
   BuildingOfficeIcon,
   RocketLaunchIcon,
+  StarIcon,
 } from '@heroicons/react/24/outline';
 
 // Navigation grouped by category
@@ -30,6 +31,7 @@ const navigationGroups = [
     items: [
       { name: 'Employees', href: '/employees', icon: UserGroupIcon },
       { name: 'Students', href: '/students', icon: AcademicCapIcon },
+      { name: 'Favorite Students', href: '/students?view=favorites', icon: StarIcon },
       { name: 'Student Documents', href: '/student-documents', icon: DocumentTextIcon },
       { name: 'Student Profiling', href: '/student-profiling', icon: UserCircleIcon },
     ],

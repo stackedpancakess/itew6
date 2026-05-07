@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { studentService } from '../services/api';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { studentService, favoriteStudentService } from '../services/api';
 import { useToast } from '../components/ToastProvider';
 
 interface Student {
@@ -45,6 +46,8 @@ const Students: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+  const [showFavoritesModal, setShowFavoritesModal] = useState(false);
   const [formData, setFormData] = useState({
     student_id: '', first_name: '', last_name: '', email: '',
     phone: '', year_level: '', program: '', date_enrolled: '',
@@ -53,8 +56,16 @@ const Students: React.FC = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const toast = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') as string) : null;
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); fetchFavorites(); }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setShowFavoritesModal(params.get('view') === 'favorites');
+  }, [location.search]);
 
   const fetchData = async () => {
     try {
@@ -65,6 +76,32 @@ const Students: React.FC = () => {
       setStudents([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+
+
+  const fetchFavorites = async () => {
+    try {
+      const favorites = await favoriteStudentService.getAll(currentUser?.id);
+      setFavoriteIds(favorites.map((f) => f.student_id));
+    } catch (err) {
+      console.error('Error fetching favorites:', err);
+      setFavoriteIds([]);
+    }
+  };
+
+  const toggleFavorite = async (studentId: number) => {
+    const isFavorite = favoriteIds.includes(studentId);
+    try {
+      if (isFavorite) {
+        await favoriteStudentService.remove(studentId, currentUser?.id);
+      } else {
+        await favoriteStudentService.add(studentId, currentUser?.id);
+      }
+      await fetchFavorites();
+    } catch (err) {
+      console.error('Error toggling favorite:', err);
     }
   };
 
@@ -244,7 +281,7 @@ const Students: React.FC = () => {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: '#f8fafc', borderBottom: '2px solid #f1f5f9' }}>
-                {['Student','Student ID','Program','Year','Status','Actions'].map(h => (
+                {['Student','Student ID','Program','Year','Status','Actions','Favorite'].map(h => (
                   <th key={h} style={{ padding: '14px 20px', textAlign: 'left', fontSize: '11px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.8px', whiteSpace: 'nowrap' }}>{h}</th>
                 ))}
               </tr>
@@ -252,7 +289,7 @@ const Students: React.FC = () => {
             <tbody>
               {paginatedStudents.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ padding: '60px 20px', textAlign: 'center' }}>
+                  <td colSpan={7} style={{ padding: '60px 20px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>🎓</div>
                       <div style={{ fontWeight: '700', fontSize: '16px', color: '#1a1a1a', fontFamily: 'Segoe UI, sans-serif' }}>No students found</div>
@@ -322,6 +359,15 @@ const Students: React.FC = () => {
                         </button>
                       </div>
                     </td>
+                    <td style={{ padding: '14px 20px', whiteSpace: 'nowrap' }}>
+                      <button
+                        onClick={() => toggleFavorite(student.id)}
+                        title={favoriteIds.includes(student.id) ? 'Remove Favorite' : 'Add to Favorites'}
+                        style={{ width: '32px', height: '32px', borderRadius: '8px', background: favoriteIds.includes(student.id) ? 'rgba(245,158,11,0.12)' : 'rgba(148,163,184,0.12)', color: favoriteIds.includes(student.id) ? '#f59e0b' : '#64748b', border: 'none', cursor: 'pointer' }}
+                      >
+                        {favoriteIds.includes(student.id) ? '★' : '☆'}
+                      </button>
+                    </td>
                   </tr>
                 );
               })}
@@ -354,6 +400,27 @@ const Students: React.FC = () => {
           </div>
         )}
       </div>
+
+
+
+      {showFavoritesModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60, padding: '20px' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', width: '90%', maxWidth: '760px', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.25)' }}>
+            <div style={{ background: '#1a1a1a', borderRadius: '16px 16px 0 0', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ color: '#fff', margin: 0 }}>Favorite Students</h2>
+              <button onClick={() => { setShowFavoritesModal(false); navigate('/students'); }} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '22px', cursor: 'pointer' }}>×</button>
+            </div>
+            <div style={{ padding: '16px 20px' }}>
+              {students.filter(s => favoriteIds.includes(s.id)).length === 0 ? <p style={{ color: '#64748b' }}>No favorite students yet.</p> : students.filter(s => favoriteIds.includes(s.id)).map(s => (
+                <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
+                  <span>{s.first_name} {s.last_name} ({s.student_id})</span>
+                  <button onClick={() => toggleFavorite(s.id)} style={{ border: 'none', background: 'transparent', color: '#f59e0b', cursor: 'pointer' }}>Remove ★</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (

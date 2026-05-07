@@ -18,6 +18,15 @@ interface Student {
   updated_at: string;
 }
 
+
+
+export interface FavoriteStudentRecord {
+  id: number;
+  student_id: number;
+  user_id: number | null;
+  student?: Student;
+}
+
 export interface StudentDocument {
   id: number;
   student_id: number;
@@ -77,6 +86,25 @@ export const studentDocumentService = {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then(res => res.data),
   delete: (id: number): Promise<void> => api.delete(`/student-documents/${id}`).then(res => res.data),
+};
+
+
+
+export const favoriteStudentService = {
+  getAll: (userId?: number | null): Promise<FavoriteStudentRecord[]> => {
+    const params = new URLSearchParams();
+    if (userId) params.append('user_id', String(userId));
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return api.get(`/favorite-students${query}`).then(res => res.data.data);
+  },
+  add: (studentId: number, userId?: number | null): Promise<FavoriteStudentRecord> =>
+    api.post('/favorite-students', { student_id: studentId, user_id: userId ?? null }).then(res => res.data.data),
+  remove: (studentId: number, userId?: number | null): Promise<void> => {
+    const params = new URLSearchParams();
+    if (userId) params.append('user_id', String(userId));
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return api.delete(`/favorite-students/${studentId}${query}`).then(res => res.data);
+  },
 };
 
 export const facultyService = {
