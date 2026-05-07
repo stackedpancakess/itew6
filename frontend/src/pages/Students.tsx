@@ -58,7 +58,19 @@ const Students: React.FC = () => {
   const toast = useToast();
   const location = useLocation();
   const navigate = useNavigate();
-  const currentUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') as string) : null;
+  const currentUser = (() => {
+    const raw = localStorage.getItem('user');
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  })();
+  const currentUserId =
+    typeof currentUser?.id === 'number'
+      ? currentUser.id
+      : (typeof currentUser?.id === 'string' && /^\d+$/.test(currentUser.id) ? Number(currentUser.id) : null);
 
   useEffect(() => { fetchData(); fetchFavorites(); }, []);
 
@@ -83,7 +95,7 @@ const Students: React.FC = () => {
 
   const fetchFavorites = async () => {
     try {
-      const favorites = await favoriteStudentService.getAll(currentUser?.id);
+      const favorites = await favoriteStudentService.getAll(currentUserId);
       setFavoriteIds(favorites.map((f) => f.student_id));
     } catch (err) {
       console.error('Error fetching favorites:', err);
@@ -95,13 +107,18 @@ const Students: React.FC = () => {
     const isFavorite = favoriteIds.includes(studentId);
     try {
       if (isFavorite) {
-        await favoriteStudentService.remove(studentId, currentUser?.id);
+        await favoriteStudentService.remove(studentId, currentUserId);
+        setFavoriteIds(prev => prev.filter(id => id !== studentId));
+        toast.success('Removed from favorites');
       } else {
-        await favoriteStudentService.add(studentId, currentUser?.id);
+        await favoriteStudentService.add(studentId, currentUserId);
+        setFavoriteIds(prev => (prev.includes(studentId) ? prev : [...prev, studentId]));
+        toast.success('Added to favorites');
       }
-      await fetchFavorites();
     } catch (err) {
       console.error('Error toggling favorite:', err);
+      toast.error('Failed to update favorite. Please try again.', 'Favorite Error');
+      await fetchFavorites();
     }
   };
 
@@ -259,19 +276,51 @@ const Students: React.FC = () => {
         </div>
       </div>
 
-      {/* Search bar */}
+      {/* Search + Favorites */}
       <div style={{ background: '#fff', borderRadius: '12px', padding: '14px 16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid rgba(0,0,0,0.06)', marginBottom: '20px' }}>
-        <div style={{ position: 'relative' }}>
-          <svg style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', pointerEvents: 'none' }} fill="none" stroke="#ff6b35" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input
-            type="text"
-            placeholder="Search students by name, email, ID, or program..."
-            value={searchTerm}
-            onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-            style={{ width: '100%', padding: '11px 16px 11px 44px', border: '2px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', fontFamily: 'Segoe UI, sans-serif', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', color: '#1a1a1a' }}
-            onFocus={e => { e.currentTarget.style.borderColor = '#ff6b35'; }}
-            onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; }}
-          />
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: 1, minWidth: '260px' }}>
+            <svg style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', pointerEvents: 'none' }} fill="none" stroke="#ff6b35" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input
+              type="text"
+              placeholder="Search students by name, email, ID, or program..."
+              value={searchTerm}
+              onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              style={{ width: '100%', padding: '11px 16px 11px 44px', border: '2px solid #e5e7eb', borderRadius: '10px', fontSize: '14px', fontFamily: 'Segoe UI, sans-serif', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.2s', color: '#1a1a1a' }}
+              onFocus={e => { e.currentTarget.style.borderColor = '#ff6b35'; }}
+              onBlur={e => { e.currentTarget.style.borderColor = '#e5e7eb'; }}
+            />
+          </div>
+
+          <button
+            onClick={() => navigate('/students?view=favorites')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 14px',
+              borderRadius: '10px',
+              border: '1px solid rgba(245,158,11,0.35)',
+              background: 'rgba(245,158,11,0.10)',
+              color: '#b45309',
+              cursor: 'pointer',
+              fontFamily: 'Segoe UI, sans-serif',
+              fontWeight: 700,
+              fontSize: '13px',
+              whiteSpace: 'nowrap',
+              transition: 'transform 0.15s, box-shadow 0.15s, background 0.15s',
+              boxShadow: '0 2px 10px rgba(245,158,11,0.18)',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.background = 'rgba(245,158,11,0.16)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(245,158,11,0.25)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'rgba(245,158,11,0.10)'; e.currentTarget.style.boxShadow = '0 2px 10px rgba(245,158,11,0.18)'; }}
+            title="View Favorite Students"
+          >
+            <span style={{ fontSize: '16px', lineHeight: 1 }}>★</span>
+            Favorite Students
+            <span style={{ marginLeft: '2px', fontWeight: 700, fontSize: '12px', color: '#92400e', background: 'rgba(245,158,11,0.18)', border: '1px solid rgba(245,158,11,0.25)', padding: '2px 8px', borderRadius: '999px' }}>
+              {favoriteIds.length}
+            </span>
+          </button>
         </div>
       </div>
 

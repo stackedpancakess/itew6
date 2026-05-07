@@ -93,15 +93,18 @@ export const studentDocumentService = {
 export const favoriteStudentService = {
   getAll: (userId?: number | null): Promise<FavoriteStudentRecord[]> => {
     const params = new URLSearchParams();
-    if (userId) params.append('user_id', String(userId));
+    if (typeof userId === 'number' && Number.isFinite(userId)) params.append('user_id', String(userId));
     const query = params.toString() ? `?${params.toString()}` : '';
     return api.get(`/favorite-students${query}`).then(res => res.data.data);
   },
   add: (studentId: number, userId?: number | null): Promise<FavoriteStudentRecord> =>
-    api.post('/favorite-students', { student_id: studentId, user_id: userId ?? null }).then(res => res.data.data),
+    api.post('/favorite-students', {
+      student_id: studentId,
+      user_id: (typeof userId === 'number' && Number.isFinite(userId)) ? userId : null,
+    }).then(res => res.data.data),
   remove: (studentId: number, userId?: number | null): Promise<void> => {
     const params = new URLSearchParams();
-    if (userId) params.append('user_id', String(userId));
+    if (typeof userId === 'number' && Number.isFinite(userId)) params.append('user_id', String(userId));
     const query = params.toString() ? `?${params.toString()}` : '';
     return api.delete(`/favorite-students/${studentId}${query}`).then(res => res.data);
   },
